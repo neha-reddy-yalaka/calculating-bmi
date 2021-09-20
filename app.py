@@ -1,36 +1,26 @@
+import json
 from flask import Flask, render_template
 import mysql.connector
+
 conn = mysql.connector.connect(user="root",password="root",host="127.0.0.1",database="my_guitar_shop",port ='3306')
 mycursor = conn.cursor()
 query = "SELECT * FROM customers"
 mycursor.execute(query)
 data = mycursor.fetchall()
-print(data)
-for (customer_id,email_address) in mycursor:
-    print("{} id and {} title".format(customer_id,email_address))
+resp = []
+for list_item in (data):
+    json_data = {"id":list_item[0],"email":list_item[1],"hash":list_item[2],"first_name":list_item[3],"last_name":list_item[4]}
+    resp.append(json_data)
+
 mycursor.close()
 conn.close()
 
-
-app = Flask(__name__)@app.route('/')
-def index():return render_template('index.html')@app.route('/v_timestamp')
-def v_timestamp():
-    mycursor.execute("SELECT * FROM customers")
-    data = mycursor.fetchall()
-    return render_template('v_timestamp.html', data=data)
-
-
-
-
 app = Flask(__name__)
 
+
 @app.route('/')
-def index():
-    return render_template('index.html')@app.route('/v_timestamp')
-def v_timestamp():
-    mycursor.execute("SELECT * FROM customers")
-    data = mycursor.fetchall()
-    return render_template('v_timestamp.html', data=data)
+def main():
+    return str(resp)
 
 
 if __name__ == '__main__':
